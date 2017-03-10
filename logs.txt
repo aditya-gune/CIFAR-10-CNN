@@ -1,0 +1,7 @@
+loss: 0.9343 - val_loss: 0.9517
+loss: 0.9362 - val_loss: 0.8993
+--------------------------------
+MODIFICATIONS MADE PER Q1
+--------------------------------
+loss: 0.7732 - val_loss: 0.9129
+loss: 0.7135 - val_loss: 0.9322
