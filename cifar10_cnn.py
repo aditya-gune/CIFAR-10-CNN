@@ -18,7 +18,7 @@ from keras.models import Sequential
 from keras.models import load_model
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, AveragePooling2D
-from keras.optimizers import SGD
+import keras.optimizers
 from keras.utils import np_utils
 
 batch_size = 32
@@ -44,28 +44,32 @@ Y_test = np_utils.to_categorical(y_test, nb_classes)
 model = Sequential()
 model.add(AveragePooling2D(pool_size=(2,2), input_shape=(img_channels, img_rows, img_cols)))
 model.add(Convolution2D(32, 3, 3, border_mode='same'))
-model.add(Activation('relu'))
+model.add(Activation('tanh'))
 model.add(Convolution2D(32, 3, 3))
-model.add(Activation('relu'))
+model.add(Activation('tanh'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 
 model.add(Convolution2D(64, 3, 3, border_mode='same'))
-model.add(Activation('relu'))
+model.add(Activation('tanh'))
 model.add(Convolution2D(64, 3, 3))
-model.add(Activation('relu'))
+model.add(Activation('tanh'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 
 model.add(Flatten())
 model.add(Dense(512))
-model.add(Activation('relu'))
-#model.add(Dropout(0.5))
+model.add(Activation('tanh'))
+model.add(Dropout(0.5))
 model.add(Dense(nb_classes))
 model.add(Activation('softmax'))
 
 # let's train the model using SGD + momentum (how original).
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+sgd = keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
+#RMSprop optimizer
+rmsprop = keras.optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)
+
 model.compile(loss='categorical_crossentropy', optimizer=sgd)
 
 X_train = X_train.astype('float32')
@@ -87,17 +91,18 @@ if not data_augmentation:
     model2 = keras.models.load_model('baseModel.h5')
     
     #pop softmax
-    layer1 = model2.layers.pop()
+    #layer1 = model2.layers.pop()
 
     #add another FC-512 layer
-    model2.add(Dense(512))
-    model2.add(Activation('softmax'))
+    #model2.add(Dense(512))
+    #model2.add(Activation('softmax'))
 
     #train and save
     model.fit(X_train, Y_train, batch_size=batch_size,
               nb_epoch=nb_epoch, show_accuracy=True,
               validation_data=(X_test, Y_test), shuffle=True)
     model.save('q1Model.h5')
+
     
 else:
     print('Using real-time data augmentation.')
